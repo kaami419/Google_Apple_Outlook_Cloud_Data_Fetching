@@ -1,0 +1,140 @@
+<!-- views/dashboard.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Contacts App</title>
+    <style>
+      body {
+        background-color: darkslategrey;
+        font-family: "Times New Roman", Times, serif;
+      }
+
+      .container {
+        margin-left: 27.5%;
+        display: flex;
+        flex-direction: column;
+        width: 45%;
+        margin-top: 10%;
+        border: 2px solid orange;
+        background-color: rgb(185, 184, 184);
+        border-radius: 2rem;
+        text-align: center;
+      }
+
+      .container:hover {
+        box-shadow: 0 4px 8px rgb(255, 255, 255);
+        border: 2px solid whitesmoke;
+      }
+
+      .header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .contacts-container {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        border: 2px solid orange;
+        margin-top: 2rem;
+        border-radius: 2rem;
+        padding: 20px;
+        flex-wrap: wrap;
+        overflow: scroll;
+      }
+
+      .contact-card {
+        border: 2px solid orange;
+        border-radius: 1rem;
+        padding: 10px;
+        margin: 10px;
+        background-color: rgb(185, 184, 184);
+        transition: box-shadow 0.3s ease;
+        cursor: move; /* Make it draggable */
+      }
+
+      .contact-card:hover {
+        box-shadow: 0 4px 8px rgb(255, 255, 255);
+        border: 2px solid whitesmoke;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1 style="color: white">AP Google Contacts</h1>
+        <p>Login Successful</p>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: center">
+      <h2 style="color: white; margin: 20px; align-self: center">Contacts</h2>
+    </div>
+    <div
+      class="contacts-container"
+      ondragover="allowDrop(event)"
+      ondrop="drop(event)"
+    >
+      <% contacts.forEach((contact, index) => { %>
+      <div
+        class="contact-card"
+        draggable="true"
+        ondragstart="drag(event)"
+        data-index="<%= index %>"
+        ondragover="allowDrop(event)"
+        ondrop="drop(event)"
+      >
+        <strong style="color: white"><%= contact.name %></strong><br />
+        <br />
+        <strong style="color: white">Phone Number:</strong> <%=
+        contact.phoneNumber %>
+      </div>
+      <% }) %>
+    </div>
+
+    <script>
+      function allowDrop(event) {
+        event.preventDefault();
+      }
+
+      function drag(event) {
+        event.dataTransfer.setData("text/plain", event.target.dataset.index);
+      }
+
+      function drop(event) {
+        event.preventDefault();
+        const fromIndex = event.dataTransfer.getData("text/plain");
+        const toIndex = event.target.dataset.index;
+
+        if (fromIndex !== toIndex) {
+          const draggedContact = contacts[fromIndex];
+          contacts.splice(fromIndex, 1);
+          contacts.splice(toIndex, 0, draggedContact);
+          renderContacts();
+        }
+      }
+
+      function renderContacts() {
+        const container = document.querySelector(".contacts-container");
+        container.innerHTML = "";
+        contacts.forEach((contact, index) => {
+          const card = document.createElement("div");
+          card.classList.add("contact-card");
+          card.setAttribute("draggable", "true");
+          card.setAttribute("ondragstart", "drag(event)");
+          card.setAttribute("data-index", index);
+          card.setAttribute("ondragover", "allowDrop(event)");
+          card.setAttribute("ondrop", "drop(event)");
+          card.innerHTML = `
+            <strong style="color: white">${contact.name}</strong><br /><br />
+            <strong style="color: white">Phone Number:</strong> ${contact.phoneNumber}
+          `;
+          container.appendChild(card);
+        });
+      }
+    </script>
+  </body>
+</html>
